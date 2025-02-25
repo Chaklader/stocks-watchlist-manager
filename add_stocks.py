@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
-# Updated stock list with exchange information
+
 stocks = [
     ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
     ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
@@ -85,53 +85,6 @@ def add_stock_to_watchlist(driver, stock_info):
         return False
     
     
-# def add_stock_to_watchlist(driver, stock_info):
-#     ticker, exchange = stock_info
-#     try:
-#         # Directly navigate to the stock's page
-#         url = f"https://www.google.com/finance/quote/{ticker}:{exchange}"
-#         driver.get(url)
-#         time.sleep(2)
-        
-#         # Find and click the Follow button
-#         follow_button = WebDriverWait(driver, 10).until(
-#             EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Follow') or contains(@aria-label, 'Following')]"))
-#         )
-        
-#         # If not already following, click to follow
-#         if "Following" not in follow_button.get_attribute("aria-label"):
-#             follow_button.click()
-#             time.sleep(1)
-        
-#         # Click again to open categories
-#         follow_button.click()
-#         time.sleep(1)
-        
-#         # Add to categories
-#         categories = ["Watchlist", "Artificial Intelligence", "Small Caps"]
-#         for category in categories:
-#             try:
-#                 category_elem = WebDriverWait(driver, 5).until(
-#                     EC.element_to_be_clickable((By.XPATH, f"//span[normalize-space()='{category}']/ancestor::div[@role='checkbox']"))
-#                 )
-#                 if category_elem.get_attribute("aria-checked") != "true":
-#                     category_elem.click()
-#                 time.sleep(0.5)
-#             except Exception as e:
-#                 print(f"Could not add to {category}: {str(e)}")
-        
-#         # Click Done
-#         done_button = WebDriverWait(driver, 5).until(
-#             EC.element_to_be_clickable((By.XPATH, "//button[text()='Done']"))
-#         )
-#         done_button.click()
-#         time.sleep(1)
-        
-#         return True
-#     except Exception as e:
-#         print(f"Error adding {ticker}:{exchange}: {str(e)}")
-#         return False
-
 def main():
     driver = setup_driver()
     
