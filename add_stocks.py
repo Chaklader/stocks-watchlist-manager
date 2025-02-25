@@ -32,7 +32,7 @@ stocks = [
     ("ABSI", "NASDAQ"),
     ("APLD", "NASDAQ"),
     ("RYDE", "NYSEAMERICAN"),
-    ("MNDR", "NASDAQ")
+    ("MNDR", "NASDAQ"),
 ]
 
 def setup_driver():
@@ -48,6 +48,23 @@ def setup_driver():
         options=chrome_options
     )
     return driver
+
+def wait_for_checkboxes(driver, max_wait=15):
+    """Poll and wait until at least one checkbox is found or timeout reached"""
+    print("Waiting for checkboxes to load...")
+    start_time = time.time()
+    while time.time() - start_time < max_wait:
+        try:
+            checkboxes = driver.find_elements(By.XPATH, "//span[@role='menuitemcheckbox']")
+            if len(checkboxes) > 0:
+                print(f"Found {len(checkboxes)} checkboxes after {time.time() - start_time:.1f} seconds")
+                return True
+        except:
+            pass
+        time.sleep(0.5)
+    
+    print(f"Warning: No checkboxes found after {max_wait} seconds")
+    return False
 
 def add_stock_to_watchlist(driver, stock_info):
     """Add a stock to specified watchlists on Google Finance."""
@@ -90,11 +107,7 @@ def add_stock_to_watchlist(driver, stock_info):
             print(f"Error clicking Following button: {str(e)}")
             return False
         
-        # Critical: Wait longer for dropdown to fully load
-        time.sleep(5)
-        
-        # Check if dropdown is visible before proceeding
-        dropdown_visible = False
+        # Wait for dropdown to appear
         try:
             dropdown = WebDriverWait(driver, 8).until(
                 EC.visibility_of_any_elements_located((
@@ -103,16 +116,16 @@ def add_stock_to_watchlist(driver, stock_info):
                 ))
             )
             if dropdown:
-                dropdown_visible = True
                 print("Dropdown is visible")
         except:
             print("Warning: Dropdown may not be visible")
+            return False
         
-        if not dropdown_visible:
-            print("Could not confirm dropdown visibility, attempting to continue")
+        # Critical: Wait for checkboxes to load
+        wait_for_checkboxes(driver)
         
-        # Wait longer for elements to stabilize
-        time.sleep(3)
+        # Additional delay to ensure everything is properly rendered
+        time.sleep(2)
         
         # Categories to check with their common attributes
         categories = [
