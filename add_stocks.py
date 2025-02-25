@@ -57,11 +57,14 @@ def add_stock_to_watchlist(driver, stock_info):
         )
         print("Dropdown is visible")
         
+        # Add a short delay to ensure dropdown is fully loaded
+        time.sleep(1)
+        
         # Define watchlist categories with their UUIDs
         categories = {
             "Watchlist": "watchlist",
             "Artificial Intelligence": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf",
-            "Small Caps": "cd1bffe1-eaf7-4ed0-b1b6-a41bb9ac2"
+            "Small Caps": "cd1bffe1-eaf7-4ed0-b1b6-a41bb9db9ac2"  # Fixed the UUID here
         }
         
         # Check each category's checkbox if not already checked
@@ -72,18 +75,31 @@ def add_stock_to_watchlist(driver, stock_info):
                     EC.element_to_be_clickable((By.XPATH, checkbox_xpath))
                 )
                 
-                if checkbox.get_attribute("aria-checked") != "true":
+                # Check if already selected
+                is_checked = checkbox.get_attribute("aria-checked") == "true"
+                print(f"{category_name} is currently {'checked' if is_checked else 'unchecked'}")
+                
+                # Only click if not already checked
+                if not is_checked:
                     driver.execute_script("arguments[0].click();", checkbox)
                     print(f"Checked {category_name}")
+                    time.sleep(0.7)  # Give time for the check to register
                 else:
-                    print(f"{category_name} already checked")
-                time.sleep(0.5)  # Small delay to ensure action registers
+                    print(f"{category_name} already checked, skipping")
+                    
             except Exception as e:
-                print(f"Couldn't add to {category_name}: {str(e)}")
+                print(f"Couldn't process {category_name}: {str(e)}")
                 continue
         
-        # No "Done" button exists; selections save automatically
-        # Proceed to next stock by returning True
+        # Close dropdown by clicking elsewhere (optional)
+        try:
+            driver.execute_script("document.body.click();")
+            print("Closed dropdown")
+        except:
+            pass
+            
+        # Small delay before moving to next stock
+        time.sleep(1.5)
         return True
         
     except Exception as e:
@@ -114,6 +130,9 @@ def main():
             else:
                 failed_adds.append(f"{ticker}:{exchange}")
                 print(f"Failed to add {ticker}:{exchange}")
+            
+            # Delay between stocks to avoid rate limiting
+            time.sleep(2)
         
         # Display summary
         print("\n=== SUMMARY ===")
