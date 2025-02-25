@@ -29,10 +29,18 @@ import random
 
 # Your list of stocks here
 stocks = [
-    ("ABSI", "NASDAQ"),
-    ("APLD", "NASDAQ"),
-    ("RYDE", "NYSEAMERICAN"),
-    ("MNDR", "NASDAQ"),
+    ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
+    ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
+    ("CRNC", "NASDAQ"), ("CEVA", "NASDAQ"), ("COHU", "NASDAQ"), ("DRIO", "NASDAQ"),
+    ("DTSS", "NASDAQ"), ("DCBO", "NASDAQ"), ("DUOT", "NASDAQ"), ("EVLV", "NASDAQ"),
+    ("FSLY", "NYSE"), ("GXAI", "NASDAQ"), ("HIVE", "NASDAQ"), ("INOD", "NASDAQ"),
+    ("IVDA", "NASDAQ"), ("KSCP", "NASDAQ"), ("LTRN", "NASDAQ"), ("LTRX", "NASDAQ"),
+    ("MFH", "NASDAQ"), ("MITK", "NASDAQ"), ("NNOX", "NASDAQ"), ("OTRK", "NASDAQ"),
+    ("PDYN", "NASDAQ"), ("PENG", "NASDAQ"), ("PERI", "NASDAQ"), ("POET", "NASDAQ"),
+    ("PRO", "NYSE"), ("RZLV", "NASDAQ"), ("RR", "NASDAQ"), ("RSKD", "NYSE"),
+    ("SPAI", "NASDAQ"), ("SERV", "NASDAQ"), ("SES", "NYSE"), ("SLNH", "NASDAQ"),
+    ("STGW", "NASDAQ"), ("IDAI", "NASDAQ"), ("TSSI", "NASDAQ"), ("VCIG", "NASDAQ"),
+    ("VRNT", "NASDAQ"), ("WBUY", "NASDAQ"), ("XMTR", "NASDAQ"), ("ZEPP", "NYSE")
 ]
 
 def setup_driver():
