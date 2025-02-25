@@ -1,26 +1,38 @@
+# # List of stocks to process (ticker, exchange)
+# stocks = [
+#     ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
+#     ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
+#     ("CRNC", "NASDAQ"), ("CEVA", "NASDAQ"), ("COHU", "NASDAQ"), ("DRIO", "NASDAQ"),
+#     ("DTSS", "NASDAQ"), ("DCBO", "NASDAQ"), ("DUOT", "NASDAQ"), ("EVLV", "NASDAQ"),
+#     ("FSLY", "NYSE"), ("GXAI", "NASDAQ"), ("HIVE", "NASDAQ"), ("INOD", "NASDAQ"),
+#     ("IVDA", "NASDAQ"), ("KSCP", "NASDAQ"), ("LTRN", "NASDAQ"), ("LTRX", "NASDAQ"),
+#     ("MFH", "NASDAQ"), ("MITK", "NASDAQ"), ("NNOX", "NASDAQ"), ("OTRK", "NASDAQ"),
+#     ("PDYN", "NASDAQ"), ("PENG", "NASDAQ"), ("PERI", "NASDAQ"), ("POET", "NASDAQ"),
+#     ("PRO", "NYSE"), ("RZLV", "NASDAQ"), ("RR", "NASDAQ"), ("RSKD", "NYSE"),
+#     ("SPAI", "NASDAQ"), ("SERV", "NASDAQ"), ("SES", "NYSE"), ("SLNH", "NASDAQ"),
+#     ("STGW", "NASDAQ"), ("IDAI", "NASDAQ"), ("TSSI", "NASDAQ"), ("VCIG", "NASDAQ"),
+#     ("VRNT", "NASDAQ"), ("WBUY", "NASDAQ"), ("XMTR", "NASDAQ"), ("ZEPP", "NYSE")
+# ]
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import random
 
-# List of stocks to process (ticker, exchange)
+# Your list of stocks here
 stocks = [
-    ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
-    ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
-    ("CRNC", "NASDAQ"), ("CEVA", "NASDAQ"), ("COHU", "NASDAQ"), ("DRIO", "NASDAQ"),
-    ("DTSS", "NASDAQ"), ("DCBO", "NASDAQ"), ("DUOT", "NASDAQ"), ("EVLV", "NASDAQ"),
-    ("FSLY", "NYSE"), ("GXAI", "NASDAQ"), ("HIVE", "NASDAQ"), ("INOD", "NASDAQ"),
-    ("IVDA", "NASDAQ"), ("KSCP", "NASDAQ"), ("LTRN", "NASDAQ"), ("LTRX", "NASDAQ"),
-    ("MFH", "NASDAQ"), ("MITK", "NASDAQ"), ("NNOX", "NASDAQ"), ("OTRK", "NASDAQ"),
-    ("PDYN", "NASDAQ"), ("PENG", "NASDAQ"), ("PERI", "NASDAQ"), ("POET", "NASDAQ"),
-    ("PRO", "NYSE"), ("RZLV", "NASDAQ"), ("RR", "NASDAQ"), ("RSKD", "NYSE"),
-    ("SPAI", "NASDAQ"), ("SERV", "NASDAQ"), ("SES", "NYSE"), ("SLNH", "NASDAQ"),
-    ("STGW", "NASDAQ"), ("IDAI", "NASDAQ"), ("TSSI", "NASDAQ"), ("VCIG", "NASDAQ"),
-    ("VRNT", "NASDAQ"), ("WBUY", "NASDAQ"), ("XMTR", "NASDAQ"), ("ZEPP", "NYSE")
+    ("ABSI", "NASDAQ"),
+    ("APLD", "NASDAQ"),
+    ("RYDE", "NYSEAMERICAN"),
+    ("MNDR", "NASDAQ")
 ]
 
 def setup_driver():
@@ -46,68 +58,152 @@ def add_stock_to_watchlist(driver, stock_info):
         driver.get(url)
         print(f"Navigated to {url}")
         
-        # Wait for the "Following" button to be present
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//div[@role='button'][@jsname='pzCKEc']"))
-        )
+        # Wait for page to fully load
+        time.sleep(4)  # Increased wait time
         
-        # Click the "Following" button to open the dropdown
-        follow_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//div[@role='button'][@jsname='pzCKEc']"))
-        )
-        driver.execute_script("arguments[0].click();", follow_button)
-        print("Clicked 'Following' button")
+        # Click the "Following" button
+        follow_button = None
+        try:
+            # Try to find the button by different methods
+            for xpath in [
+                "//div[@role='button'][@jsname='pzCKEc']",
+                "//div[@role='button']//*[text()='Following']/..",
+                "//div[@role='button']//span[contains(text(), 'Following')]/.."
+            ]:
+                try:
+                    follow_button = WebDriverWait(driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
+                    if follow_button:
+                        break
+                except:
+                    continue
+                    
+            if follow_button:
+                # Click using ActionChains
+                ActionChains(driver).move_to_element(follow_button).click().perform()
+                print("Clicked 'Following' button")
+            else:
+                print("Could not find 'Following' button")
+                return False
+        except Exception as e:
+            print(f"Error clicking Following button: {str(e)}")
+            return False
         
-        # Wait for the dropdown to appear
-        WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, "XvhY1d"))
-        )
-        print("Dropdown is visible")
+        # Critical: Wait longer for dropdown to fully load
+        time.sleep(5)
         
-        # Add a short delay to ensure dropdown is fully loaded
-        time.sleep(1)
+        # Check if dropdown is visible before proceeding
+        dropdown_visible = False
+        try:
+            dropdown = WebDriverWait(driver, 8).until(
+                EC.visibility_of_any_elements_located((
+                    By.XPATH, 
+                    "//span[@role='menuitemcheckbox'] | //div[contains(@class, 'XvhY1d')] | //div[contains(@class, 'JAPqpe')]"
+                ))
+            )
+            if dropdown:
+                dropdown_visible = True
+                print("Dropdown is visible")
+        except:
+            print("Warning: Dropdown may not be visible")
         
-        # Define watchlist categories with their UUIDs
-        categories = {
-            "Watchlist": "watchlist",
-            "Artificial Intelligence": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf",
-            "Small Caps": "cd1bffe1-eaf7-4ed0-b1b6-a41bb9db9ac2"  # Fixed the UUID here
-        }
+        if not dropdown_visible:
+            print("Could not confirm dropdown visibility, attempting to continue")
         
-        # Check each category's checkbox if not already checked
-        for category_name, uuid in categories.items():
+        # Wait longer for elements to stabilize
+        time.sleep(3)
+        
+        # Categories to check with their common attributes
+        categories = [
+            {"name": "Watchlist", "uuid": "watchlist"},
+            {"name": "Artificial Intelligence", "uuid": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf"},
+            {"name": "Small Caps", "uuid": "cd1bffe1-eaf7-4ed0-b1b6-a41bb9db9ac2"}
+        ]
+        
+        successful_categories = 0
+        
+        # Process each category
+        for category in categories:
+            category_name = category["name"]
+            uuid = category["uuid"]
+            
             try:
-                checkbox_xpath = f"//div[@data-bundle-uuid='{uuid}']/ancestor::span[@role='menuitemcheckbox']"
-                checkbox = WebDriverWait(driver, 5).until(
-                    EC.element_to_be_clickable((By.XPATH, checkbox_xpath))
-                )
+                # Try a simpler, more reliable approach to find checkboxes
+                checkbox = None
+                
+                # Method 1: Find by class and text content
+                try:
+                    checkbox_elements = driver.find_elements(By.XPATH, "//span[@role='menuitemcheckbox']")
+                    for element in checkbox_elements:
+                        if category_name in element.text:
+                            checkbox = element
+                            break
+                except:
+                    pass
+                
+                # Method 2: Find by data-bundle-uuid
+                if not checkbox:
+                    try:
+                        checkbox = driver.find_element(
+                            By.XPATH, f"//div[@data-bundle-uuid='{uuid}']/ancestor::span[@role='menuitemcheckbox']"
+                        )
+                    except:
+                        pass
+                
+                # Method 3: Find by text directly
+                if not checkbox:
+                    try:
+                        checkbox = driver.find_element(
+                            By.XPATH, f"//div[contains(text(), '{category_name}')]/ancestor::span[@role='menuitemcheckbox']"
+                        )
+                    except:
+                        pass
+                
+                if not checkbox:
+                    print(f"Could not locate {category_name} checkbox")
+                    continue
                 
                 # Check if already selected
-                is_checked = checkbox.get_attribute("aria-checked") == "true"
-                print(f"{category_name} is currently {'checked' if is_checked else 'unchecked'}")
-                
-                # Only click if not already checked
-                if not is_checked:
-                    driver.execute_script("arguments[0].click();", checkbox)
-                    print(f"Checked {category_name}")
-                    time.sleep(0.7)  # Give time for the check to register
-                else:
-                    print(f"{category_name} already checked, skipping")
+                try:
+                    is_checked = checkbox.get_attribute("aria-checked") == "true"
+                    print(f"{category_name} is currently {'checked' if is_checked else 'unchecked'}")
                     
+                    if not is_checked:
+                        # Scroll to make sure it's in view
+                        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox)
+                        time.sleep(1)
+                        
+                        # Click with ActionChains - move to element with offset
+                        actions = ActionChains(driver)
+                        actions.move_to_element(checkbox).move_by_offset(5, 5).click().perform()
+                        print(f"Clicked {category_name} checkbox")
+                        
+                        time.sleep(2)  # Wait for checkbox state to update
+                    else:
+                        print(f"{category_name} already checked, skipping")
+                    
+                    successful_categories += 1
+                except Exception as e:
+                    print(f"Error processing checkbox state for {category_name}: {str(e)}")
             except Exception as e:
-                print(f"Couldn't process {category_name}: {str(e)}")
-                continue
+                print(f"Error processing {category_name}: {str(e)}")
         
-        # Close dropdown by clicking elsewhere (optional)
+        # Try to close dropdown by clicking elsewhere
         try:
-            driver.execute_script("document.body.click();")
-            print("Closed dropdown")
+            # Click at coordinates away from the dropdown
+            ActionChains(driver).move_by_offset(-300, -300).click().perform()
+            print("Closed dropdown by clicking elsewhere")
         except:
-            pass
-            
-        # Small delay before moving to next stock
-        time.sleep(1.5)
-        return True
+            try:
+                # Press ESC key as fallback
+                ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+                print("Closed dropdown with ESC key")
+            except:
+                print("Could not close dropdown, continuing anyway")
+        
+        # Success if we handled at least one category or if categories were already set
+        return successful_categories > 0
         
     except Exception as e:
         print(f"Error adding {ticker}:{exchange}: {str(e)}")
@@ -128,22 +224,40 @@ def main():
         failed_adds = []
         
         # Process each stock
-        for stock_info in stocks:
+        for i, stock_info in enumerate(stocks):
             ticker, exchange = stock_info
-            print(f"\nProcessing {ticker}:{exchange}...")
-            if add_stock_to_watchlist(driver, stock_info):
-                successful_adds.append(f"{ticker}:{exchange}")
-                print(f"Successfully added {ticker}:{exchange}")
-            else:
+            print(f"\nProcessing {i+1}/{len(stocks)}: {ticker}:{exchange}...")
+            
+            # Try twice for each stock
+            success = False
+            for attempt in range(2):
+                if attempt > 0:
+                    print(f"Retry attempt for {ticker}:{exchange}")
+                
+                if add_stock_to_watchlist(driver, stock_info):
+                    successful_adds.append(f"{ticker}:{exchange}")
+                    print(f"Successfully added {ticker}:{exchange}")
+                    success = True
+                    break
+                
+                # Wait before retry
+                if not success and attempt < 1:
+                    print(f"Waiting before retry...")
+                    time.sleep(5)
+            
+            if not success:
                 failed_adds.append(f"{ticker}:{exchange}")
                 print(f"Failed to add {ticker}:{exchange}")
             
-            # Delay between stocks to avoid rate limiting
-            time.sleep(2)
+            # Add a delay between stocks
+            if i < len(stocks) - 1:
+                delay = random.uniform(3.0, 5.0)
+                print(f"Waiting {delay:.1f} seconds before processing next stock...")
+                time.sleep(delay)
         
         # Display summary
         print("\n=== SUMMARY ===")
-        print(f"Successfully added: {len(successful_adds)}")
+        print(f"Successfully added: {len(successful_adds)} of {len(stocks)}")
         print(f"Failed to add: {len(failed_adds)}")
         
         if failed_adds:
@@ -155,7 +269,8 @@ def main():
         print(f"Major error occurred: {str(e)}")
     
     finally:
-        input("\nPress Enter to close the browser...")
+        print("\nPress Enter to close the browser...")
+        input()
         driver.quit()
 
 if __name__ == "__main__":
