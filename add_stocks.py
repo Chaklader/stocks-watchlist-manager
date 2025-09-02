@@ -23,24 +23,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 import random
 
 # Your list of stocks here
 stocks = [
-    ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
-    ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
-    ("CRNC", "NASDAQ"), ("CEVA", "NASDAQ"), ("COHU", "NASDAQ"), ("DRIO", "NASDAQ"),
-    ("DTSS", "NASDAQ"), ("DCBO", "NASDAQ"), ("DUOT", "NASDAQ"), ("EVLV", "NASDAQ"),
-    ("FSLY", "NYSE"), ("GXAI", "NASDAQ"), ("HIVE", "NASDAQ"), ("INOD", "NASDAQ"),
-    ("IVDA", "NASDAQ"), ("KSCP", "NASDAQ"), ("LTRN", "NASDAQ"), ("LTRX", "NASDAQ"),
-    ("MFH", "NASDAQ"), ("MITK", "NASDAQ"), ("NNOX", "NASDAQ"), ("OTRK", "NASDAQ"),
-    ("PDYN", "NASDAQ"), ("PENG", "NASDAQ"), ("PERI", "NASDAQ"), ("POET", "NASDAQ"),
-    ("PRO", "NYSE"), ("RZLV", "NASDAQ"), ("RR", "NASDAQ"), ("RSKD", "NYSE"),
-    ("SPAI", "NASDAQ"), ("SERV", "NASDAQ"), ("SES", "NYSE"), ("SLNH", "NASDAQ"),
-    ("STGW", "NASDAQ"), ("IDAI", "NASDAQ"), ("TSSI", "NASDAQ"), ("VCIG", "NASDAQ"),
-    ("VRNT", "NASDAQ"), ("WBUY", "NASDAQ"), ("XMTR", "NASDAQ"), ("ZEPP", "NYSE")
+    ("HL", "NYSE"), ("EXK", "NYSE"), ("TRX", "NYSEAMERICAN"), ("GAU", "NYSEAMERICAN"),
+    ("BTG", "NYSEAMERICAN"), ("SAND", "NYSE"), ("UEC", "NYSEAMERICAN"), ("MUX", "NYSE"),
+    ("UROY", "NASDAQ"), ("ASM", "NYSEAMERICAN")
 ]
 
 def setup_driver():
@@ -51,10 +41,8 @@ def setup_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
     
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=chrome_options
-    )
+    service = Service()
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def wait_for_checkboxes(driver, max_wait=15):
@@ -138,8 +126,8 @@ def add_stock_to_watchlist(driver, stock_info):
         # Categories to check with their common attributes
         categories = [
             {"name": "Watchlist", "uuid": "watchlist"},
-            {"name": "Artificial Intelligence", "uuid": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf"},
-            {"name": "Small Caps", "uuid": "cd1bffe1-eaf7-4ed0-b1b6-a41bb9db9ac2"}
+            {"name": "RES-NEW", "uuid": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf"},
+            {"name": "Mining", "uuid": "a0fcb5d8-7398-4fba-87d0-be85faaedfaf"},
         ]
         
         successful_categories = 0
