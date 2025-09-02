@@ -1,19 +1,3 @@
-# # List of stocks to process (ticker, exchange)
-# stocks = [
-#     ("ABSI", "NASDAQ"), ("APLD", "NASDAQ"), ("ARBE", "NASDAQ"), ("BMR", "NASDAQ"),
-#     ("BBAI", "NYSE"), ("BTBT", "NASDAQ"), ("BZAI", "NASDAQ"), ("BLIN", "NASDAQ"),
-#     ("CRNC", "NASDAQ"), ("CEVA", "NASDAQ"), ("COHU", "NASDAQ"), ("DRIO", "NASDAQ"),
-#     ("DTSS", "NASDAQ"), ("DCBO", "NASDAQ"), ("DUOT", "NASDAQ"), ("EVLV", "NASDAQ"),
-#     ("FSLY", "NYSE"), ("GXAI", "NASDAQ"), ("HIVE", "NASDAQ"), ("INOD", "NASDAQ"),
-#     ("IVDA", "NASDAQ"), ("KSCP", "NASDAQ"), ("LTRN", "NASDAQ"), ("LTRX", "NASDAQ"),
-#     ("MFH", "NASDAQ"), ("MITK", "NASDAQ"), ("NNOX", "NASDAQ"), ("OTRK", "NASDAQ"),
-#     ("PDYN", "NASDAQ"), ("PENG", "NASDAQ"), ("PERI", "NASDAQ"), ("POET", "NASDAQ"),
-#     ("PRO", "NYSE"), ("RZLV", "NASDAQ"), ("RR", "NASDAQ"), ("RSKD", "NYSE"),
-#     ("SPAI", "NASDAQ"), ("SERV", "NASDAQ"), ("SES", "NYSE"), ("SLNH", "NASDAQ"),
-#     ("STGW", "NASDAQ"), ("IDAI", "NASDAQ"), ("TSSI", "NASDAQ"), ("VCIG", "NASDAQ"),
-#     ("VRNT", "NASDAQ"), ("WBUY", "NASDAQ"), ("XMTR", "NASDAQ"), ("ZEPP", "NYSE")
-# ]
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -27,10 +11,16 @@ import time
 import random
 
 # Your list of stocks here
+# stocks = [
+#     ("HL", "NYSE"), ("EXK", "NYSE"), ("TRX", "NYSEAMERICAN"), ("GAU", "NYSEAMERICAN"),
+#     ("BTG", "NYSEAMERICAN"), ("SAND", "NYSE"), ("UEC", "NYSEAMERICAN"), ("MUX", "NYSE"),
+#     ("UROY", "NASDAQ"), ("ASM", "NYSEAMERICAN")
+# ]
+
 stocks = [
-    ("HL", "NYSE"), ("EXK", "NYSE"), ("TRX", "NYSEAMERICAN"), ("GAU", "NYSEAMERICAN"),
-    ("BTG", "NYSEAMERICAN"), ("SAND", "NYSE"), ("UEC", "NYSEAMERICAN"), ("MUX", "NYSE"),
-    ("UROY", "NASDAQ"), ("ASM", "NYSEAMERICAN")
+    ("SVM", "NYSEAMERICAN"), ("EXK", "NYSE"), ("BTG", "NYSEAMERICAN"), ("TGB", "NYSEAMERICAN"),
+    ("DV", "TSX"), ("HL", "NYSE"), ("FSM", "NYSE"), ("SBSW", "NYSE"),
+    ("CDE", "NYSE"), ("KGC", "NYSE")
 ]
 
 def setup_driver():
